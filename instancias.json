@@ -1,0 +1,14 @@
+[
+    {
+        "url": "http:\/\/localhost:8080",
+        "api_key": "ECHrPuIAPU9fOQRsLBYAsJpKvA0v7jhA",
+        "endpoints": {
+            "bitacoras": "http:\/\/localhost:8080\/wp-json\/wp\/v2\/bitacora",
+            "fosas": "http:\/\/localhost:8080\/wp-json\/wp\/v2\/fosa",
+            "indicios": "http:\/\/localhost:8080\/wp-json\/wp\/v2\/indicio"
+        },
+        "fecha_registro": "2025-05-13 20:20:37",
+        "ultima_confirmacion": "2025-05-13 20:20:40",
+        "activa": true
+    }
+]
