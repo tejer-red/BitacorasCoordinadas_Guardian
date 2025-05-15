@@ -28,13 +28,39 @@ function extract_taxonomy_links($post) {
     return $result;
 }
 
+function fetch_media_url($base_url, $media_id) {
+    $media_url = "{$base_url}/wp-json/wp/v2/media/{$media_id}";
+    echo "  🔍 Buscando media URL: {$media_url}\n";
 
+    $json = @file_get_contents($media_url);
+
+    if ($json === false) {
+        echo "  ⚠️ Error al obtener datos para ID: {$media_id}\n";
+        return null;
+    }
+
+    $media_data = json_decode($json, true);
+
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        echo "  ⚠️ Error al decodificar JSON para ID: {$media_id}: " . json_last_error_msg() . "\n";
+        return null;
+    }
+
+    if (!isset($media_data['source_url'])) {
+        echo "  ⚠️ No se encontró 'source_url' en la respuesta para ID: {$media_id}\n";
+        return null;
+    }
+
+    echo "  ✅ ID: {$media_id} -> URL: {$media_data['source_url']}\n";
+    return $media_data['source_url'];
+}
 
 function save_json($path, $data) {
     $dir = dirname($path);
     if (!is_dir($dir)) mkdir($dir, 0777, true);
     file_put_contents($path, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 }
+
 function merge_terms_by_id(array $existing, array $new): array {
     $by_id = [];
     foreach ($existing as $term) {

@@ -1,2 +1,5 @@
 # Ignore all files in the output directory
 output/**/*
+instancias.json
+instancias2.json
+instancias.json
