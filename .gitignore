@@ -2,4 +2,4 @@
 output/**/*
 instancias.json
 instancias2.json
-instancias.json
+*.json
