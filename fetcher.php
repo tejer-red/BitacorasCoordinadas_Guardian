@@ -1,18 +1,36 @@
 <?php
 
 function fetch_posts($url) {
-    $json = file_get_contents($url);
+    $json = fetch_remote_data($url);
     return json_decode($json, true) ?: [];
 }
 
 function fetch_meta($url) {
-    $json = @file_get_contents($url);
+    $json = fetch_remote_data($url);
     return json_decode($json, true) ?: [];
 }
 
 function fetch_terms($url) {
-    $json = @file_get_contents($url);
+    $json = fetch_remote_data($url);
     return json_decode($json, true) ?: [];
+}
+
+function fetch_remote_data($url) {
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Disable SSL verification for testing
+    curl_setopt($ch, CURLOPT_TIMEOUT, 10); // Set timeout
+    $response = curl_exec($ch);
+
+    if (curl_errno($ch)) {
+        echo "  ⚠️ cURL Error: " . curl_error($ch) . "\n";
+        curl_close($ch);
+        return null;
+    }
+
+    curl_close($ch);
+    return $response;
 }
 
 function extract_taxonomy_links($post) {
@@ -32,9 +50,9 @@ function fetch_media_url($base_url, $media_id) {
     $media_url = "{$base_url}/wp-json/wp/v2/media/{$media_id}";
     echo "  🔍 Buscando media URL: {$media_url}\n";
 
-    $json = @file_get_contents($media_url);
+    $json = fetch_remote_data($media_url);
 
-    if ($json === false) {
+    if (!$json) {
         echo "  ⚠️ Error al obtener datos para ID: {$media_id}\n";
         return null;
     }
@@ -75,10 +93,10 @@ function merge_terms_by_id(array $existing, array $new): array {
 }
 
 function fetch_custom_meta($base_url, $post_type, $post_id) {
-    $post_type =  substr($post_type, 0, -1);
+    $post_type = substr($post_type, 0, -1);
     $meta_url = "{$base_url}/wp-json/personalizado/v1/info/{$post_type}/{$post_id}";
     echo "  🔍 Buscando meta: {$meta_url}\n";
-    $json = file_get_contents($meta_url);
+    $json = fetch_remote_data($meta_url);
     echo "  🔍 Meta: {$json}\n";
     return $json ? json_decode($json, true) : [];
 }

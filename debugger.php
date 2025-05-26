@@ -62,21 +62,21 @@ function debug_post_details($post, $taxonomies, $featured_image, $gallery_images
     echo "<p><strong>Slug:</strong> {$post['slug']}</p>";
     echo "<p><strong>Tipo:</strong> {$post['type']}</p>";
 
-    // Display taxonomies
-    echo "<p><strong>Taxonomías:</strong></p><ul>";
-    foreach ($taxonomies as $tax_name => $tax_url) {
-        echo "<li><strong>{$tax_name}:</strong> <a href='{$tax_url}'>{$tax_url}</a></li>";
-    }
-    echo "</ul>";
-
     // Display metadata
     if (!empty($post['meta'])) {
         echo "<h4>Meta Datos</h4><ul>";
         foreach ($post['meta'] as $key => $value) {
-            if (is_array($value)) {
-                $value = implode(', ', $value);
-            }
+            $value = is_array($value) ? implode(', ', $value) : $value;
             echo "<li><strong>{$key}:</strong> {$value}</li>";
+        }
+        echo "</ul>";
+    }
+
+    // Display taxonomies
+    if (!empty($post['taxonomies'])) {
+        echo "<h4>Taxonomías</h4><ul>";
+        foreach ($post['taxonomies'] as $taxonomy) {
+            echo "<li><strong>{$taxonomy['taxonomy']}:</strong> {$taxonomy['name']} (Slug: {$taxonomy['slug']}, ID: {$taxonomy['id']})</li>";
         }
         echo "</ul>";
     }
@@ -94,4 +94,15 @@ function debug_post_details($post, $taxonomies, $featured_image, $gallery_images
     }
 
     echo "</div>";
+}
+
+function debug_export_header($instance, $type) {
+    return "
+    <div style='border: 1px solid #ccc; padding: 10px; margin-bottom: 20px; background: #f9f9f9;'>
+        <h2>Exportación</h2>
+        <p><strong>Instancia:</strong> {$instance}</p>
+        <p><strong>Tipo:</strong> {$type}</p>
+        <p><strong>Generado por:</strong> " . __FUNCTION__ . "()</p>
+    </div>
+    ";
 }
