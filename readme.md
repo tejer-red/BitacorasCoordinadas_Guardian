@@ -87,7 +87,7 @@ php main.php
 Es fácil ejecutar este proyecto para desarrollo utilizando el servidor embebido de PHP en Ubuntu. Solo necesitas ejecutar el siguiente comando desde el directorio raíz del proyecto:
 
 ```bash
-php -S localhost:9999 -t ./
+php -S 0.0.0.0:9999 -t ./
 ```
 
 Esto iniciará un servidor local en `http://localhost:9999`, donde podrás probar las funcionalidades de los archivos `main.php` e `instancias.php`.
