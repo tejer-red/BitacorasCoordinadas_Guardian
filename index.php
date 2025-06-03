@@ -9,6 +9,7 @@ $app = AppFactory::create();
 
 // Incluir rutas externas
 require __DIR__ . '/routes/validarNodo.php';
+require __DIR__ . '/routes/registrarInstancia.php';
 
 // Página de inicio (HTML)
 $app->get('/', function (Request $request, Response $response, $args) {
