@@ -92,6 +92,16 @@ php -S 0.0.0.0:9999 -t ./
 
 Esto iniciará un servidor local en `http://localhost:9999`, donde podrás probar las funcionalidades de los archivos `main.php` e `instancias.php`.
 
+### Probar API endpoints desde Wordpress
+
+Es necesario exponer el puerto local se puede utilizar.
+
+```bash
+npm install -g localtunnel
+lt --port 9999
+```
+
+El puerto 9999 es arbitrario, cambialo según tus necesidades.
 ---
 
 ## Requisitos
@@ -110,3 +120,24 @@ Esto iniciará un servidor local en `http://localhost:9999`, donde podrás proba
 Si deseas contribuir a este proyecto, por favor abre un issue o envía un pull request.
 
 ---
+
+
+## En desarrollo de esta rama
+### Composer y Slim Framework
+
+Se instaló Composer y Slim Framework para gestionar las dependencias y crear una API REST más robusta:
+
+```bash
+# Instalar Composer
+curl -sS https://getcomposer.org/installer | php
+sudo mv composer.phar /usr/local/bin/composer
+
+# Instalar Slim
+composer require slim/slim:"4.*"
+```
+
+Alternativamente, puedes instalar todas las dependencias desde el archivo `composer.json`:
+
+```bash
+composer install
+```
