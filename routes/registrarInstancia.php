@@ -19,12 +19,20 @@ $app->map(['POST', 'OPTIONS'], '/registrarInstancia', function (Request $request
     }
 
     // Leer y validar datos de entrada
-    $input = json_decode($request->getBody()->getContents(), true);
+    $rawBody = $request->getBody()->getContents();
 
+    // DEBUG extra: loguear siempre el cuerpo recibido para depuración de errores 500
+    error_log("registrarInstancia.php RAW BODY: " . $rawBody);
+
+    $input = json_decode($rawBody, true);
+
+    // DEBUG: Si el JSON es inválido, mostrar el cuerpo recibido para depuración
     if (json_last_error() !== JSON_ERROR_NONE || !$input) {
         $response->getBody()->write(json_encode([
             'success' => false,
-            'message' => 'Datos JSON inválidos'
+            'message' => 'Datos JSON inválidos',
+            'debug_body' => $rawBody,
+            'json_last_error' => json_last_error_msg()
         ]));
         return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
     }
