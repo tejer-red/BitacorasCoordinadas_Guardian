@@ -91,19 +91,21 @@ php -S 0.0.0.0:9999 -t ./
 ```
 
 Esto iniciará un servidor local en `http://localhost:9999`, donde podrás probar las funcionalidades de los archivos `main.php` e `instancias.php`.
+---
+El puerto 9999 es arbitrario, cambialo según tus necesidades.
 
-### Probar API endpoints desde Wordpress
+## Probar API endpoints desde Wordpress
 
 Es necesario exponer el puerto local se puede utilizar.
 
 ```bash
 npm install -g localtunnel
 lt --port 9999
+# O específicamente con subdominio:
+lt --port 9999 --subdomain apicachetest
 ```
 
-El puerto 9999 es arbitrario, cambialo según tus necesidades.
 ---
-
 ## Requisitos
 
 - PHP 7.4 o superior.
