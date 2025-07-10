@@ -141,8 +141,39 @@ $app->get('/exportar', function (Request $request, Response $response, $args) {
 
     function process_post($base, $tipo, $post, $base_url, &$all_posts, &$general_report) {
         $id = $post['id'];
-        debug_info("🔍 Procesando post ID: <strong>{$id}</strong>");
-        flush(); if (ob_get_level() > 0) { ob_flush(); }
+        // Ruta donde se guarda el JSON del post
+        $json_path = __DIR__ . "/../output/{$base}/{$tipo}/{$id}.json";
+        if (file_exists($json_path)) {
+            // Si existe, cargar datos del JSON y validar que sea un array
+            $saved = json_decode(file_get_contents($json_path), true);
+            if (is_array($saved)) {
+                debug_info("🔄 Post ID {$id} ya exportado, usando cache.");
+                flush(); if (ob_get_level() > 0) { ob_flush(); }
+                $all_posts[] = [
+                    'id' => $saved['id'],
+                    'title' => is_array($saved['title']) ? $saved['title']['rendered'] : $saved['title'],
+                    'meta' => $saved['meta'],
+                    'slug' => $saved['slug'],
+                    'date' => $saved['date'],
+                ];
+                $general_report[] = [
+                    'instance' => $base,
+                    'type' => $tipo,
+                    'id' => $saved['id'],
+                    'title' => is_array($saved['title']) ? $saved['title']['rendered'] : $saved['title'],
+                    'meta' => $saved['meta'],
+                    'slug' => $saved['slug'],
+                    'date' => $saved['date'],
+                    'media_url' => $saved['media_url'] ?? null,
+                    'taxonomies' => $saved['taxonomies'] ?? [],
+                ];
+                return;
+            } else {
+                debug_warning("⚠️ El JSON cacheado para el post ID {$id} está corrupto o no es un array. Se ignorará el cache y se volverá a descargar.");
+                // Opcional: unlink($json_path);
+            }
+        }
+
         $meta_url = "{$base_url}";
         $meta = fetch_meta($meta_url);
         $post['meta'] = $meta;
