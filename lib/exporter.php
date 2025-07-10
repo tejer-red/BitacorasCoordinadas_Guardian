@@ -13,17 +13,20 @@ function generate_post_html($base, $tipo, $post) {
     $base_url = get_base_url();
     $export_header = debug_export_header($base, $tipo);
 
+    // Corrige el título para soportar array o string
+    $title = is_array($post['title']) && isset($post['title']['rendered']) ? $post['title']['rendered'] : $post['title'];
+
     $html_content = "
 <!DOCTYPE html>
 <html lang='en'>
 <head>
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <title>{$post['title']}</title>
+    <title>{$title}</title>
 </head>
 <body>
     {$export_header}
-    <h1>{$post['title']}</h1>
+    <h1>{$title}</h1>
     <p><strong>Fecha:</strong> {$post['date']}</p>
     <p><strong>Slug:</strong> {$post['slug']}</p>
     <h2>Meta Datos</h2>
@@ -31,7 +34,9 @@ function generate_post_html($base, $tipo, $post) {
 
     // Include meta data
     foreach ($post['meta'] as $key => $value) {
-        $value = is_array($value) ? implode(', ', $value) : $value;
+        if (is_array($value)) {
+            $value = implode(', ', array_map('strval', $value));
+        }
         $html_content .= "<li><strong>{$key}:</strong> {$value}</li>";
     }
 
@@ -82,10 +87,11 @@ function generate_post_list_html($base, $tipo, $all_posts) {
 ";
 
     foreach ($all_posts as $post) {
+        $title = is_array($post['title']) && isset($post['title']['rendered']) ? $post['title']['rendered'] : $post['title'];
         $post_url = "{$base_url}/output/{$base}/{$tipo}/{$post['id']}.html";
         $list_html .= "
         <div style='border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;'>
-            <h2><a href='{$post_url}'>{$post['title']}</a></h2>
+            <h2><a href='{$post_url}'>{$title}</a></h2>
             <p><strong>Fecha:</strong> {$post['date']}</p>
             <p><strong>Slug:</strong> {$post['slug']}</p>
             <h3>Meta Datos</h3>
