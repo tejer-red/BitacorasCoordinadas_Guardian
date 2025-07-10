@@ -10,9 +10,19 @@ $app = AppFactory::create();
 // Incluir rutas externas
 require __DIR__ . '/routes/validarNodo.php';
 require __DIR__ . '/routes/registrarInstancia.php';
+require __DIR__ . '/routes/exportar.php';
 
 // Página de inicio (HTML)
-$app->get('/', function (Request $request, Response $response, $args) {
+$app->get('/', function (Request $request, Response $response, $args) use ($app) {
+    // Obtener rutas registradas
+    $routes = [];
+    foreach ($app->getRouteCollector()->getRoutes() as $route) {
+        $pattern = $route->getPattern();
+        $methods = implode(', ', $route->getMethods());
+        $routes[] = "<li><code>{$methods}</code> <a href=\"{$pattern}\">{$pattern}</a></li>";
+    }
+    $routes_html = implode("\n", $routes);
+
     $html = <<<HTML
 <!DOCTYPE html>
 <html lang="es">
@@ -25,6 +35,8 @@ $app->get('/', function (Request $request, Response $response, $args) {
   <h1>API CACHE - INDEX</h1>
     <p>Pagina de inicio, en desarrollo endpoints</p>
     <ul>
+    {$routes_html}
+    </ul>
 </body>
 </html>
 HTML;

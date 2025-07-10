@@ -56,8 +56,20 @@ function debug_post_details($post, $taxonomies, $featured_image, $gallery_images
 
     // Display basic post details
     echo "<p><strong>ID:</strong> {$post['id']}</p>";
-    echo "<p><strong>Título:</strong> {$post['title']['rendered']}</p>";
-    echo "<p><strong>Contenido:</strong> {$post['content']['rendered']}</p>";
+    $title = is_array($post['title']) && isset($post['title']['rendered']) ? $post['title']['rendered'] : $post['title'];
+    echo "<p><strong>Título:</strong> {$title}</p>";
+
+    // Corrige acceso a content
+    $content = '';
+    if (isset($post['content'])) {
+        if (is_array($post['content']) && isset($post['content']['rendered'])) {
+            $content = $post['content']['rendered'];
+        } elseif (is_string($post['content'])) {
+            $content = $post['content'];
+        }
+    }
+    echo "<p><strong>Contenido:</strong> {$content}</p>";
+
     echo "<p><strong>Fecha:</strong> {$post['date']}</p>";
     echo "<p><strong>Slug:</strong> {$post['slug']}</p>";
     echo "<p><strong>Tipo:</strong> {$post['type']}</p>";
