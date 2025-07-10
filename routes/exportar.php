@@ -107,6 +107,7 @@ $app->get('/exportar', function (Request $request, Response $response, $args) {
 
     // Redefinir las funciones para imprimir y flush en cada paso relevante
     function process_instance($instancia, &$general_report) {
+        print_r($instancia);
         if (!$instancia['activa']) {
             debug_warning("Instancia inactiva: <strong>{$instancia['url']}</strong>");
             flush(); if (ob_get_level() > 0) { ob_flush(); }
@@ -122,6 +123,17 @@ $app->get('/exportar', function (Request $request, Response $response, $args) {
 
     function process_endpoint($base, $tipo, $endpoint, $base_url, &$general_report) {
         debug_info("📥 Tipo: <strong>{$tipo}</strong>");
+        debug_info("🔍 Tipo de endpoint: " . (is_string($endpoint) ? "string" : (is_array($endpoint) ? "array" : "otro tipo")));
+        if (is_string($endpoint)) {
+            $endpoint .= "?per_page=100";
+        } elseif (is_array($endpoint)) {
+            foreach ($endpoint as &$url) {
+                if (is_string($url)) {
+                    $url .= "?per_page=100";
+                }
+            }
+        }
+        debug_info("🔗 Endpoint: <strong>{$endpoint}</strong>");
         flush(); if (ob_get_level() > 0) { ob_flush(); }
         $posts = fetch_posts($endpoint);
         if (empty($posts)) {

@@ -44,4 +44,25 @@ HTML;
     return $response->withHeader('Content-Type', 'text/html');
 });
 
+// Ruta para servir archivos estáticos de /output con CORS habilitado
+$app->get('/output/{params:.*}', function (Request $request, Response $response, $args) {
+    $file = __DIR__ . '/output/' . $args['params'];
+    if (!file_exists($file) || !is_file($file)) {
+        return $response->withStatus(404)->write('Archivo no encontrado');
+    }
+    $ext = pathinfo($file, PATHINFO_EXTENSION);
+    $mime = 'text/plain';
+    if ($ext === 'json') $mime = 'application/json';
+    if ($ext === 'html') $mime = 'text/html';
+    if ($ext === 'jpg' || $ext === 'jpeg') $mime = 'image/jpeg';
+    if ($ext === 'png') $mime = 'image/png';
+    if ($ext === 'gif') $mime = 'image/gif';
+    $stream = fopen($file, 'rb');
+    $body = new \Slim\Psr7\Stream($stream);
+    return $response
+        ->withHeader('Content-Type', $mime)
+        ->withHeader('Access-Control-Allow-Origin', '*')
+        ->withBody($body);
+});
+
 $app->run();
