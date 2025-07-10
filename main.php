@@ -28,12 +28,35 @@ function process_instance($instancia, &$general_report) {
     }
 }
 
+/**
+ * Intenta obtener posts de un endpoint con reintentos y espera.
+ * Esta función es reutilizable para otros endpoints.
+ */
+function retry_fetch_posts($endpoint, $max_attempts = 3, $sleep_seconds = 3) {
+    $attempt = 0;
+    $posts = [];
+    while ($attempt < $max_attempts) {
+        $posts = fetch_posts($endpoint);
+        if (!empty($posts)) {
+            break;
+        }
+        $attempt++;
+        if ($attempt < $max_attempts) {
+            debug_warning("Intento {$attempt} fallido para el endpoint: <strong>{$endpoint}</strong>. Reintentando en {$sleep_seconds} segundos...");
+            sleep($sleep_seconds);
+        }
+    }
+    return $posts;
+}
+
 function process_endpoint($base, $tipo, $endpoint, $base_url, &$general_report) {
     debug_info("📥 Tipo: <strong>{$tipo}</strong>");
-    $posts = fetch_posts($endpoint);
+    
+    // Usar la función desacoplada de reintentos
+    $posts = retry_fetch_posts($endpoint);
 
     if (empty($posts)) {
-        debug_warning("No se encontraron posts para el endpoint: <strong>{$endpoint}</strong>");
+        debug_warning("No se encontraron posts para el endpoint: <strong>{$endpoint}</strong> después de 3 intentos.");
         return;
     }
 
