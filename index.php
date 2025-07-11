@@ -4,6 +4,7 @@ require __DIR__ . '/vendor/autoload.php';
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Factory\AppFactory;
+use Nyholm\Psr7\Stream; // Añade esta línea
 
 $app = AppFactory::create();
 
@@ -11,6 +12,7 @@ $app = AppFactory::create();
 require __DIR__ . '/routes/validarNodo.php';
 require __DIR__ . '/routes/registrarInstancia.php';
 require __DIR__ . '/routes/exportar.php';
+require __DIR__ . '/routes/reiniciar.php';
 
 // Página de inicio (HTML)
 $app->get('/', function (Request $request, Response $response, $args) use ($app) {
@@ -48,7 +50,11 @@ HTML;
 $app->get('/output/{params:.*}', function (Request $request, Response $response, $args) {
     $file = __DIR__ . '/output/' . $args['params'];
     if (!file_exists($file) || !is_file($file)) {
-        return $response->withStatus(404)->write('Archivo no encontrado');
+        return $response
+            ->withStatus(404)
+            ->withHeader('Access-Control-Allow-Origin', '*')
+            ->withHeader('Content-Type', 'application/json')
+            ->write(json_encode(['error' => 'Archivo no encontrado']));
     }
     $ext = pathinfo($file, PATHINFO_EXTENSION);
     $mime = 'text/plain';
@@ -58,7 +64,7 @@ $app->get('/output/{params:.*}', function (Request $request, Response $response,
     if ($ext === 'png') $mime = 'image/png';
     if ($ext === 'gif') $mime = 'image/gif';
     $stream = fopen($file, 'rb');
-    $body = new \Slim\Psr7\Stream($stream);
+    $body = Stream::create($stream); // Usa Nyholm\Psr7\Stream
     return $response
         ->withHeader('Content-Type', $mime)
         ->withHeader('Access-Control-Allow-Origin', '*')
